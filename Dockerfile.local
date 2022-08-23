@@ -1,0 +1,11 @@
+FROM golang:latest
+
+RUN mkdir /code
+WORKDIR /code
+
+RUN go install github.com/silenceper/gowatch@latest
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+CMD ["gowatch"]

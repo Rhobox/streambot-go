@@ -1,0 +1,11 @@
+version: '3'
+services:
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - ./:/code
+      - ./dbs:/dbs
+    environment:
+      - DB_LOCATION=/dbs
