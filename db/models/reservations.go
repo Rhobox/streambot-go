@@ -10,5 +10,6 @@ type Reservation struct {
 	ChannelID    string
 	GameID       string
 	SpeedrunOnly bool
+	Name         string
 	Streams      []Stream
 }

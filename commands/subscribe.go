@@ -8,8 +8,10 @@ import (
 	"streambot/db/models"
 )
 
-var CommandSubscribe string
-var CommandSpeedrun string
+var (
+	CommandSubscribe string
+	CommandSpeedrun  string
+)
 
 func init() {
 	CommandSubscribe = "subscribe"
@@ -34,6 +36,7 @@ func Subscribe(c *Command) {
 		GuildID:      c.Event.GuildID,
 		ChannelID:    c.Event.ChannelID,
 		GameID:       gameID,
+		Name:         c.RawArguments,
 		SpeedrunOnly: c.Name == CommandSpeedrun,
 	}
 	db.Conn.Create(&reservation)

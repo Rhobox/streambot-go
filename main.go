@@ -41,7 +41,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	command, err := commands.Parse(s, m)
 	if err != nil {
-		logger.Debugf("Error parsing command: %v", err)
+		if err != commands.ErrNotACommand {
+			logger.Debugf("Error parsing command: %v", err)
+		}
+
 		return
 	}
 
