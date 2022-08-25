@@ -32,3 +32,4 @@ go.work
 .env
 code
 streambot
+*.db

@@ -4,6 +4,7 @@ import (
 	"github.com/aricodes-oss/std"
 	"github.com/bwmarrin/discordgo"
 
+	"streambot/commands"
 	"streambot/config"
 	"streambot/discord"
 	"time"
@@ -32,24 +33,27 @@ func main() {
 	std.WaitForKill()
 }
 
-func messageIsCommand(message string) bool {
-	return len(message) >= 2 && string(message[0]) == "!"
-}
-
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Only process commands from external users and not any other messages
-	if m.Author.ID == s.State.User.ID || !messageIsCommand(m.Content) {
+	if m.Author.ID == s.State.User.ID {
 		return
 	}
 
-	logger.Debug(m.Content)
-
-	if m.Content == "!ping" {
-		s.ChannelMessageSend(m.ChannelID, "Pong!")
+	command, err := commands.Parse(s, m)
+	if err != nil {
+		logger.Debugf("Error parsing command: %v", err)
+		return
 	}
 
-	if m.Content == "!sleep" {
+	switch command.Name {
+	case commands.CommandSubscribe, commands.CommandSpeedrun:
+		commands.Subscribe(command)
+	case commands.CommandUnsubscribe:
+		commands.Unsubscribe(command)
+	case "ping":
+		command.Reply("Pong!")
+	case "sleep":
 		time.Sleep(time.Second * 5)
-		s.ChannelMessageSend(m.ChannelID, "Slept!")
+		command.Reply("Slept!")
 	}
 }
