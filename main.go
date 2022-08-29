@@ -4,9 +4,13 @@ import (
 	"github.com/aricodes-oss/std"
 	"github.com/bwmarrin/discordgo"
 
+	"streambot/channels"
 	"streambot/commands"
 	"streambot/config"
 	"streambot/discord"
+	"streambot/workers"
+
+	"sync"
 	"time"
 )
 
@@ -24,13 +28,19 @@ func main() {
 	defer session.Close()
 
 	logger.Info("Discord connected successfully!")
-
 	if config.Config.Debug {
 		logger.Warn("Running with debug enabled, be careful!")
 		logger = logger.WithDebug()
 	}
 
+	wg := &sync.WaitGroup{}
+	workers.LaunchAll(wg)
+
 	std.WaitForKill()
+	logger.Info("Kill signal received, shutting down workers...")
+
+	close(channels.Running)
+	wg.Wait()
 }
 
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
