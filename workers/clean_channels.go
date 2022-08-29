@@ -56,14 +56,13 @@ func CleanChannelsWorker(wg *sync.WaitGroup) {
 		case <-channels.Running:
 			return
 		case <-ticker.C:
-			clientLock.Lock()
 			reservations := []models.Reservation{}
 			db.Conn.Distinct("channel_id").Find(&reservations)
 
 			for _, reservation := range reservations {
 				log.Debugf("Cleaning channel ID %v", reservation.ChannelID)
+				subgroup.Add(1)
 				go func(cid string) {
-					subgroup.Add(1)
 					defer subgroup.Done()
 
 					clean_channel(cid)
@@ -71,7 +70,6 @@ func CleanChannelsWorker(wg *sync.WaitGroup) {
 			}
 
 			subgroup.Wait()
-			clientLock.Unlock()
 		}
 	}
 }

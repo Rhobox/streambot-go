@@ -9,7 +9,6 @@ import (
 
 var log = std.Logger
 var discordClient = discord.Session
-var clientLock = &sync.Mutex{}
 
 func LaunchAll(wg *sync.WaitGroup) {
 	go StreamsWorker(wg)

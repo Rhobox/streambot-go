@@ -68,14 +68,13 @@ func StreamsWorker(wg *sync.WaitGroup) {
 		case <-channels.Running:
 			return
 		case <-ticker.C:
-			clientLock.Lock()
 			reservations := []models.Reservation{}
 			db.Conn.Distinct("game_id", "name").Find(&reservations)
 
 			for _, reservation := range reservations {
 				log.Debugf("Fetching game ID %v (%v)", reservation.GameID, reservation.Name)
+				subgroup.Add(1)
 				go func(gid string) {
-					subgroup.Add(1)
 					defer subgroup.Done()
 
 					fetch_streams(gid)
@@ -85,7 +84,6 @@ func StreamsWorker(wg *sync.WaitGroup) {
 			// Wait for all calls to come back so we only run these queries
 			// at *max* as often as the ticker allows
 			subgroup.Wait()
-			clientLock.Unlock()
 		}
 	}
 }

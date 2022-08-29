@@ -40,7 +40,6 @@ func ScrubDBWorker(wg *sync.WaitGroup) {
 		case <-channels.Running:
 			return
 		case <-ticker.C:
-			clientLock.Lock()
 			reservations := []models.Reservation{}
 			db.Conn.Find(&reservations)
 
@@ -49,7 +48,6 @@ func ScrubDBWorker(wg *sync.WaitGroup) {
 				log.Debugf("Scrubbing messages table for %v", reservation.ID)
 				scrub_db(reservation.ID)
 			}
-			clientLock.Unlock()
 		}
 	}
 }

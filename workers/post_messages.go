@@ -67,14 +67,13 @@ func PostMessagesWorker(wg *sync.WaitGroup) {
 		case <-channels.Running:
 			return
 		case <-ticker.C:
-			clientLock.Lock()
 			reservations := []models.Reservation{}
 			db.Conn.Find(&reservations)
 
 			for _, reservation := range reservations {
 				log.Debugf("Posting new messages for reservation ID %v", reservation.ID)
+				subgroup.Add(1)
 				go func(rid uint) {
-					subgroup.Add(1)
 					defer subgroup.Done()
 
 					post_messages(rid)
@@ -82,7 +81,6 @@ func PostMessagesWorker(wg *sync.WaitGroup) {
 			}
 
 			subgroup.Wait()
-			clientLock.Unlock()
 		}
 	}
 }
