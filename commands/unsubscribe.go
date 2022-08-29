@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"streambot/twitch"
+	"streambot/workers"
 
 	"streambot/db"
 	"streambot/db/models"
@@ -26,6 +27,7 @@ func Unsubscribe(c *Command) {
 		c.Reply(fmt.Sprintf("Unexpected error: %v", err))
 		return
 	}
+
 	db.Conn.Where(&models.Reservation{
 		GuildID: c.Event.GuildID,
 		GameID:  gameID,
@@ -36,6 +38,11 @@ func Unsubscribe(c *Command) {
 		return
 	}
 
+	// Clear out the channel before it falls out of scope of the reservation
+	db.Conn.Unscoped().Where(&models.Stream{ReservationID: reservation.ID}).Delete(&models.Stream{})
+	workers.CleanChannelsWorker()
+
 	db.Conn.Delete(&reservation)
+
 	c.Reply("Unsubscribed!")
 }

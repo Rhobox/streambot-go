@@ -43,6 +43,10 @@ func main() {
 	wg.Wait()
 }
 
+func deleteUserMessage(c *commands.Command) {
+	discord.Session.ChannelMessageDelete(c.Event.ChannelID, c.Event.Message.ID)
+}
+
 func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	// Only process commands from external users and not any other messages
 	if m.Author.ID == s.State.User.ID {
@@ -61,8 +65,10 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	switch command.Name {
 	case commands.CommandSubscribe, commands.CommandSpeedrun:
 		commands.Subscribe(command)
+		deleteUserMessage(command)
 	case commands.CommandUnsubscribe:
 		commands.Unsubscribe(command)
+		deleteUserMessage(command)
 	case "ping":
 		command.Reply("Pong!")
 	case "sleep":

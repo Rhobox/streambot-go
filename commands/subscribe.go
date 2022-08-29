@@ -6,6 +6,7 @@ import (
 
 	"streambot/db"
 	"streambot/db/models"
+	"streambot/workers"
 )
 
 var (
@@ -41,5 +42,6 @@ func Subscribe(c *Command) {
 	}
 	db.Conn.Create(&reservation)
 
-	c.Reply("Subscribed!")
+	c.Reply("Subscribed! Gathering streams now, this may take a minute.")
+	workers.StreamsWorker()
 }

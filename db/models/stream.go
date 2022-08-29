@@ -9,4 +9,5 @@ type Stream struct {
 	ReservationID uint
 	Username      string
 	MessageID     string `gorm:"index"`
+	GameID        string `gorm:"index"`
 }

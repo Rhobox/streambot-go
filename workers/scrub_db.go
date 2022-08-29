@@ -1,11 +1,9 @@
 package workers
 
 import (
-	"streambot/channels"
 	"streambot/db"
 	"streambot/db/models"
 	"sync"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -29,25 +27,23 @@ func scrub_db(rid uint) {
 	})
 }
 
-func ScrubDBWorker(wg *sync.WaitGroup) {
-	wg.Add(1)
-	defer wg.Done()
+func ScrubDBWorker() {
+	subgroup := sync.WaitGroup{}
 
-	ticker := time.NewTicker(30 * time.Second)
+	reservations := []models.Reservation{}
+	db.Conn.Find(&reservations)
 
-	for {
-		select {
-		case <-channels.Running:
-			return
-		case <-ticker.C:
-			reservations := []models.Reservation{}
-			db.Conn.Find(&reservations)
+	// Running these operations synchronously on purpose
+	for _, reservation := range reservations {
+		log.Debugf("Scrubbing messages table for %v", reservation.ID)
+		subgroup.Add(1)
 
-			// Running these operations synchronously on purpose
-			for _, reservation := range reservations {
-				log.Debugf("Scrubbing messages table for %v", reservation.ID)
-				scrub_db(reservation.ID)
-			}
-		}
+		go func(rid uint) {
+			defer subgroup.Done()
+
+			scrub_db(rid)
+		}(reservation.ID)
 	}
+
+	subgroup.Wait()
 }

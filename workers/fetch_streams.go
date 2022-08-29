@@ -1,14 +1,12 @@
 package workers
 
 import (
-	"streambot/channels"
 	"streambot/constants"
 	"streambot/db"
 	"streambot/db/models"
 	"streambot/twitch"
 
 	"sync"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -54,36 +52,33 @@ func fetch_streams(gameID string) {
 	})
 }
 
-func StreamsWorker(wg *sync.WaitGroup) {
-	wg.Add(1)
-	defer wg.Done()
-
-	ticker := time.NewTicker(30 * time.Second)
-	defer ticker.Stop()
-
+func StreamsWorker() {
 	subgroup := sync.WaitGroup{}
 
-	for {
-		select {
-		case <-channels.Running:
-			return
-		case <-ticker.C:
-			reservations := []models.Reservation{}
-			db.Conn.Distinct("game_id", "name").Find(&reservations)
+	reservations := []models.Reservation{}
+	db.Conn.Distinct("game_id", "name").Select("*").Find(&reservations)
 
-			for _, reservation := range reservations {
-				log.Debugf("Fetching game ID %v (%v)", reservation.GameID, reservation.Name)
-				subgroup.Add(1)
-				go func(gid string) {
-					defer subgroup.Done()
-
-					fetch_streams(gid)
-				}(reservation.GameID)
+	for _, reservation := range reservations {
+		if reservation.Name == "" {
+			name, err := twitch.GameName(reservation.GameID)
+			if err == nil {
+				reservation.Name = name
+				log.Infof("Filled in missing name for %v (%v)", reservation.GameID, reservation.Name)
+				db.Conn.Save(&reservation)
 			}
-
-			// Wait for all calls to come back so we only run these queries
-			// at *max* as often as the ticker allows
-			subgroup.Wait()
 		}
+
+		log.Debugf("Fetching game ID %v (%v)", reservation.GameID, reservation.Name)
+		subgroup.Add(1)
+		go func(gid string) {
+			defer subgroup.Done()
+
+			fetch_streams(gid)
+		}(reservation.GameID)
 	}
+
+	// Wait for all calls to come back so we only run these queries
+	// at *max* as often as the ticker allows
+	subgroup.Wait()
+
 }
