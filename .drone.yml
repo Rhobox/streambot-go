@@ -9,6 +9,9 @@ platform:
 steps:
   - name: build
     image: plugins/docker
+    volumes:
+      - name: pkgcache
+        path: /go/pkg
     settings:
       repo: cluster.gov:5000/streambot-go
       mirror: http://piracy.gov:5001
@@ -17,3 +20,8 @@ steps:
       registry: cluster.gov:5000
       insecure: true
       purge: false
+
+volumes:
+  - name: pkgcache
+    host:
+      path: /shared/build-cache/streambot
