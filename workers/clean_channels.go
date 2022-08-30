@@ -12,11 +12,13 @@ import (
 func clean_channel(channelID string) (err error) {
 	channel, err := discordClient.Channel(channelID)
 	if err != nil {
+		log.Warnf("Failed to open channel %v: %v", channelID, err)
 		return err
 	}
 
 	lastHundred, err := discordClient.ChannelMessages(channelID, 100, "", "", channel.LastMessageID)
 	if err != nil {
+		log.Warnf("Failed to fetch messages in %v: %v", channelID, err)
 		return err
 	}
 

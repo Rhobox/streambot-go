@@ -25,12 +25,14 @@ func CleanStaleMessages() {
 
 		// Clear out people that are no longer streaming
 		if err := tx.Unscoped().Where("username NOT IN ?", usernames).Delete(&models.Stream{}).Error; err != nil {
+			log.Warnf("Failed to clear out stale usernames: %v", err)
 			return err
 		}
 
 		// Clear out people that are no longer streaming the same game
 		for _, stream := range live_streams {
-			if err := tx.Unscoped().Where("username = ? AND game_id != ?", stream.Username, stream.GameID).Delete(&models.Stream{}).Error; err != nil {
+			if err := tx.Unscoped().Where("username = ?", stream.Username).Where("game_id != ?", stream.GameID).Delete(&models.Stream{}).Error; err != nil {
+				log.Warnf("Failed to clear out streams with different games: %v", err)
 				return err
 			}
 		}

@@ -41,10 +41,12 @@ func fetch_streams(gameID string) {
 	// Batch full delete, then batch insert in the same transaction
 	db.Conn.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Unscoped().Where("game_id = ?", gameID).Delete(&models.TwitchStream{}).Error; err != nil {
+			log.Warnf("Failed to batch delete twitch streams for %v: %v", gameID, err)
 			return err
 		}
 
 		if err := tx.Create(&records).Error; err != nil {
+			log.Warnf("Failed to batch insert twitch streams for %v: %v", gameID, err)
 			return err
 		}
 

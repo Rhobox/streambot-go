@@ -19,6 +19,8 @@ func scrub_db(rid uint) {
 
 				if err != nil {
 					tx.Unscoped().Delete(stream)
+				} else {
+					log.Warnf("Failed to fetch message %v: %v", stream.MessageID, err)
 				}
 			}
 		}
