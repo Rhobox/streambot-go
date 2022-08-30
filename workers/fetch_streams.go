@@ -45,6 +45,10 @@ func fetch_streams(gameID string) {
 			return err
 		}
 
+		if len(records) == 0 {
+			return nil
+		}
+
 		if err := tx.Create(&records).Error; err != nil {
 			log.Warnf("Failed to batch insert twitch streams for %v: %v", gameID, err)
 			return err

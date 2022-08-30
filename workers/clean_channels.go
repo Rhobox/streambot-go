@@ -9,7 +9,7 @@ import (
 	"streambot/db/models"
 )
 
-func clean_channel(channelID string) (err error) {
+func clean_channel(channelID string) error {
 	channel, err := discordClient.Channel(channelID)
 	if err != nil {
 		log.Warnf("Failed to open channel %v: %v", channelID, err)
@@ -39,7 +39,7 @@ func clean_channel(channelID string) (err error) {
 
 	discordClient.ChannelMessagesBulkDelete(channelID, toDelete)
 
-	return
+	return nil
 }
 
 func CleanChannelsWorker() {
