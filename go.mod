@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/aricodes-oss/std v0.0.0-20220829215446-78864555de24
 	github.com/bwmarrin/discordgo v0.26.1
+	github.com/clinet/discordgo-embed v0.0.0-20220113222025-bafe0c917646
 	github.com/deckarep/golang-set/v2 v2.1.0
 	github.com/joho/godotenv v1.4.0
 	github.com/nicklaw5/helix v1.25.0
@@ -13,7 +14,6 @@ require (
 )
 
 require (
-	github.com/clinet/discordgo-embed v0.0.0-20220113222025-bafe0c917646 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect

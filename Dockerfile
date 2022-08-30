@@ -1,10 +1,11 @@
 FROM golang:alpine as build
 
-VOLUME ["/go/pkg"]
-
 RUN apk add gcc sqlite-dev build-base
 
 WORKDIR /streambot
+
+COPY go.mod go.sum ./
+RUN go mod download
 
 COPY . .
 
