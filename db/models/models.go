@@ -4,4 +4,5 @@ var All = []interface{}{
 	&Reservation{},
 	&Stream{},
 	&TwitchStream{},
+	&BlacklistedUser{},
 }
