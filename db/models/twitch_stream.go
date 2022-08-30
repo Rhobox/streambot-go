@@ -6,7 +6,7 @@ import (
 
 type TwitchStream struct {
 	gorm.Model
-	Username     string `gorm:"index;unique"`
+	Username     string `gorm:"index"`
 	DisplayName  string
 	GameID       string `gorm:"index"`
 	Description  string
