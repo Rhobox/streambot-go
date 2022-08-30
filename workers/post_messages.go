@@ -78,6 +78,7 @@ func PostMessagesWorker() {
 
 	for _, reservation := range reservations {
 		log.Debugf("Posting new messages for reservation ID %v", reservation.ID)
+
 		subgroup.Add(1)
 		go func(rid uint) {
 			defer subgroup.Done()

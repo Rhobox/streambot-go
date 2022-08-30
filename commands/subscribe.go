@@ -33,6 +33,13 @@ func Subscribe(c *Command) {
 		return
 	}
 
+	existing := models.Reservation{}
+	db.Conn.Where(&models.Reservation{GameID: gameID, GuildID: c.Event.GuildID, ChannelID: c.Event.ChannelID}).First(&existing)
+
+	if existing.ID != 0 {
+		c.Reply(fmt.Sprintf("This channel is already subscribed to %v streams", c.RawArguments))
+	}
+
 	reservation := models.Reservation{
 		GuildID:      c.Event.GuildID,
 		ChannelID:    c.Event.ChannelID,

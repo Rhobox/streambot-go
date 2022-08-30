@@ -23,9 +23,9 @@ var discordClient = discord.Session
 var allWorkers = []*ScheduledTask{
 	{Run: StreamsWorker, Delay: 15 * time.Second},
 	{Run: CleanChannelsWorker},
-	{Run: PostMessagesWorker, Delay: 20 * time.Second},
+	{Run: PostMessagesWorker, Delay: 15 * time.Second},
 	{Run: ScrubDBWorker},
-	{Run: CleanStaleMessages, Delay: 10 * time.Second},
+	{Run: CleanStaleMessages, Delay: 20 * time.Second},
 }
 
 func Launch(wg *sync.WaitGroup, task *ScheduledTask) {

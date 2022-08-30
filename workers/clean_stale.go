@@ -8,11 +8,15 @@ import (
 )
 
 func CleanStaleMessages() {
-	log.Debug("Marking old stream messages for deletion")
 	live_streams := []models.TwitchStream{}
 
 	db.Conn.Transaction(func(tx *gorm.DB) error {
 		tx.Find(&live_streams)
+		if len(live_streams) == 0 {
+			return nil
+		}
+
+		log.Debug("Marking old stream messages for deletion")
 
 		usernames := make([]string, len(live_streams))
 		for idx, stream := range live_streams {

@@ -1,0 +1,19 @@
+kind: pipeline
+type: docker
+name: publish
+
+platform:
+  os: linux
+  arch: arm64
+
+steps:
+  - name: build
+    image: plugins/docker
+    settings:
+      repo: cluster.gov:5000/streambot-go
+      mirror: http://piracy.gov:5001
+      tags:
+        - latest
+      registry: cluster.gov:5000
+      insecure: true
+      purge: false
