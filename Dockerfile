@@ -1,5 +1,7 @@
 FROM golang:alpine as build
 
+RUN apk add gcc sqlite-dev build-base
+
 WORKDIR /streambot
 
 COPY . .
