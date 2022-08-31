@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"streambot/twitch"
 
 	"streambot/db"
@@ -24,12 +25,26 @@ func init() {
 	}
 }
 
+func userCanManageMessages(c *Command) bool {
+	perms, err := c.Session.UserChannelPermissions(c.Session.State.User.ID, c.Event.ChannelID)
+	if err != nil {
+		return false
+	}
+
+	return perms&discordgo.PermissionManageMessages != 0
+}
+
 func Subscribe(c *Command) {
 	c.Reply("Sure! One moment while I look up that game.")
 
 	gameID, err := twitch.GameID(c.RawArguments)
 	if err != nil || gameID == "" {
 		c.Reply(fmt.Sprintf("Unexpected error: %v", err))
+		return
+	}
+
+	if !userCanManageMessages(c) {
+		c.Reply("User does not have permission to manage messages. This permission is required to function.")
 		return
 	}
 
