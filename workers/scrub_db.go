@@ -18,7 +18,6 @@ func scrub_db(rid uint) {
 				_, err := discordClient.ChannelMessage(res.ChannelID, stream.MessageID)
 
 				if err != nil {
-					log.Warnf("Failed to fetch message %v: %v", stream.MessageID, err)
 					tx.Unscoped().Delete(stream)
 				}
 			}
